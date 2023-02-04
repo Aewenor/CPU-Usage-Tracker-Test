@@ -12,7 +12,7 @@ int cpuValues[MAXCPUS][10]; //Storage for current cpu values
 int oldCpuValues[MAXCPUS][10]; //Storage for previous cpu values
 double percentValue[MAXCPUS]; //percentage usage of cpu
 
-void *Reader(void *thid){
+void *Reader(){
 
    char string[100];
    char* token;
@@ -44,7 +44,7 @@ for(int z=0;z<2;z++){
    return EXIT_SUCCESS;
 }
 
-void *Analyzer(void *thid){
+void *Analyzer(){
 
    int prevIdle, idle, prevBusy, busy, prevTotal, total, totaldiff, idlediff;
 
@@ -68,7 +68,7 @@ void *Analyzer(void *thid){
    return EXIT_SUCCESS;
 }
 
-void *Printer(void *thid){
+void *Printer(){
 
    for(int i=0;i<MAXCPUS;i++) {
       //printf("Previous values CPU %d - User: %d Nice: %d System: %d Idle: %d iowait: %d irq: %d softirq: %d Steal: %d Guest: %d Guest_nice: %d \n", i, oldCpuValues[i][0], oldCpuValues[i][1],oldCpuValues[i][2],oldCpuValues[i][3],oldCpuValues[i][4],oldCpuValues[i][5],oldCpuValues[i][6],oldCpuValues[i][7],oldCpuValues[i][8],oldCpuValues[i][9]); //print previous values

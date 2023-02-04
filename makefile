@@ -1,5 +1,8 @@
 CC = gcc
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -Wextra
+
+#CC = clang-12
+#CFLAGS = -Weverything
 
 TARGET = main
 
