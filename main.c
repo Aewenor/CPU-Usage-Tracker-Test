@@ -9,7 +9,6 @@ int oldCpuValues[10]; //Storage for previous cpu values
 double percentValue; //percentage usage of cpu
 
 void *Reader(void *thid){
-
    FILE* fp = fopen("/proc/stat","r"); //open file
 
    fscanf(fp, "%*s %d %d %d %d %d %d %d %d %d %d", &oldCpuValues[0], &oldCpuValues[1],&oldCpuValues[2],&oldCpuValues[3],&oldCpuValues[4],&oldCpuValues[5],&oldCpuValues[6],&oldCpuValues[7],&oldCpuValues[8],&oldCpuValues[9]); //save old values
@@ -39,20 +38,22 @@ void *Analyzer(void *thid){
 	percentValue = ((double)(totaldiff - idlediff)/totaldiff)*100.0;
 }
 
+void *Printer(void *thid){
+	printf("Current values - User: %d Nice: %d System: %d Idle: %d iowait: %d irq: %d softirq: %d Steal: %d Guest: %d Guest_nice: %d \n", cpuValues[0], cpuValues[1],cpuValues[2],cpuValues[3],cpuValues[4],cpuValues[5],cpuValues[6],cpuValues[7],cpuValues[8],cpuValues[9]); //print current values
+
+	printf("Previous values - User: %d Nice: %d System: %d Idle: %d iowait: %d irq: %d softirq: %d Steal: %d Guest: %d Guest_nice: %d \n", oldCpuValues[0], oldCpuValues[1],oldCpuValues[2],oldCpuValues[3],oldCpuValues[4],oldCpuValues[5],oldCpuValues[6],oldCpuValues[7],oldCpuValues[8],oldCpuValues[9]); //print previous values
+
+   printf("Current CPU usage: %.3lf %%", percentValue);
+}
+
 int main(){
-   pthread_create(&thread_ids[0], NULL, Reader, NULL);
-   sleep(3);
-   printf("User: %d Nice: %d System: %d Idle: %d iowait: %d irq: %d softirq: %d Steal: %d Guest: %d Guest_nice: %d \n", cpuValues[0], cpuValues[1],cpuValues[2],cpuValues[3],cpuValues[4],cpuValues[5],cpuValues[6],cpuValues[7],cpuValues[8],cpuValues[9]); //print values (temporary help)
-   printf("User: %d Nice: %d System: %d Idle: %d iowait: %d irq: %d softirq: %d Steal: %d Guest: %d Guest_nice: %d \n", oldCpuValues[0], oldCpuValues[1],oldCpuValues[2],oldCpuValues[3],oldCpuValues[4],oldCpuValues[5],oldCpuValues[6],oldCpuValues[7],oldCpuValues[8],oldCpuValues[9]); //print values (temporary help)
-   pthread_create(&thread_ids[0], NULL, Reader, NULL);
-   sleep(3);
-   printf("User: %d Nice: %d System: %d Idle: %d iowait: %d irq: %d softirq: %d Steal: %d Guest: %d Guest_nice: %d \n", cpuValues[0], cpuValues[1],cpuValues[2],cpuValues[3],cpuValues[4],cpuValues[5],cpuValues[6],cpuValues[7],cpuValues[8],cpuValues[9]); //print values (temporary help)
-   printf("User: %d Nice: %d System: %d Idle: %d iowait: %d irq: %d softirq: %d Steal: %d Guest: %d Guest_nice: %d \n", oldCpuValues[0], oldCpuValues[1],oldCpuValues[2],oldCpuValues[3],oldCpuValues[4],oldCpuValues[5],oldCpuValues[6],oldCpuValues[7],oldCpuValues[8],oldCpuValues[9]); //print values (temporary help)
-   pthread_create(&thread_ids[1], NULL, Analyzer, NULL);
-   sleep(1);
-   printf("Percentage usage: %lf %%", percentValue); //print values (temporary help)
+   pthread_create(&thread_ids[0], NULL, Reader, NULL); //run Reader
+   sleep(2);
+   pthread_create(&thread_ids[1], NULL, Analyzer, NULL); //run Analyzer
+   pthread_create(&thread_ids[2], NULL, Printer, NULL); //run Printer
 
    pthread_join(thread_ids[0], NULL);
    pthread_join(thread_ids[1], NULL);
+   pthread_join(thread_ids[2], NULL);
 }
    
