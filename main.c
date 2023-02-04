@@ -2,48 +2,77 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <string.h>
+
+#define MAXCPUS 6
 
 pthread_t thread_ids[5]; //IDs of threads
-int cpuValues[10]; //Storage for current cpu values
-int oldCpuValues[10]; //Storage for previous cpu values
-double percentValue; //percentage usage of cpu
+
+int cpuValues[MAXCPUS][10]; //Storage for current cpu values
+int oldCpuValues[MAXCPUS][10]; //Storage for previous cpu values
+double percentValue[MAXCPUS]; //percentage usage of cpu
 
 void *Reader(void *thid){
-   FILE* fp = fopen("/proc/stat","r"); //open file
 
-   fscanf(fp, "%*s %d %d %d %d %d %d %d %d %d %d", &oldCpuValues[0], &oldCpuValues[1],&oldCpuValues[2],&oldCpuValues[3],&oldCpuValues[4],&oldCpuValues[5],&oldCpuValues[6],&oldCpuValues[7],&oldCpuValues[8],&oldCpuValues[9]); //save old values
+   char string[100];
+   char* token;
+   int tokorder;
+   FILE* fp;
 
-   sleep(1); //wait a second
-   rewind(fp); //back to the beginning of the file
+for(int z=0;z<2;z++){
 
-   fscanf(fp, "%*s %d %d %d %d %d %d %d %d %d %d", &cpuValues[0], &cpuValues[1],&cpuValues[2],&cpuValues[3],&cpuValues[4],&cpuValues[5],&cpuValues[6],&cpuValues[7],&cpuValues[8],&cpuValues[9]); //save current values
+   memcpy(oldCpuValues,cpuValues, sizeof(cpuValues));
 
+   fp = fopen("/proc/stat","r"); //open file
+   fgets(string,100,fp); //skip first line with summed cpu usage
+   for(int i=0;i<MAXCPUS;i++) {
+      fgets(string,100,fp);
+      token = strtok(string," ");
+      tokorder=0;
+      while(token!=NULL) {
+         //if(tokorder!=0) oldCpuValues[i][tokorder-1] = atoi(token);
+         if(tokorder!=0) cpuValues[i][tokorder-1] = atoi(token);
+         token = strtok(NULL," ");
+         tokorder++;
+      }
+   }
+   
    fclose(fp); //close file
+   sleep(1);
+   }
 }
 
 void *Analyzer(void *thid){
-	int prevIdle = oldCpuValues[3]+oldCpuValues[4]; //previous idle + iowait
-	int idle = cpuValues[3]+cpuValues[4]; //current idle + iowait
 
-	int prevBusy = oldCpuValues[0]+oldCpuValues[1]+oldCpuValues[2]+oldCpuValues[5]+oldCpuValues[6]+oldCpuValues[7]; //previous user + nice + system + irq + softirq + steal
+   int prevIdle, idle, prevBusy, busy, prevTotal, total, totaldiff, idlediff;
 
-	int busy = cpuValues[0]+cpuValues[1]+cpuValues[2]+cpuValues[5]+cpuValues[6]+cpuValues[7]; //current user + nice + system + irq + softirq + steal
+   for(int i=0;i<MAXCPUS;i++) {
+      prevIdle = oldCpuValues[i][3]+oldCpuValues[i][4]; //previous idle + iowait
+      idle = cpuValues[i][3]+cpuValues[i][4]; //current idle + iowait
 
-	int prevTotal = prevBusy+prevIdle;
-	int total = busy+idle;
+      prevBusy = oldCpuValues[i][0]+oldCpuValues[i][1]+oldCpuValues[i][2]+oldCpuValues[i][5]+oldCpuValues[i][6]+oldCpuValues[i][7]; //previous user + nice + system + irq + softirq + steal
 
-	int totaldiff = total - prevTotal;
-	int idlediff = idle - prevIdle;
+      busy = cpuValues[i][0]+cpuValues[i][1]+cpuValues[i][2]+cpuValues[i][5]+cpuValues[i][6]+cpuValues[i][7]; //current user + nice + system + irq + softirq + steal
 
-	percentValue = ((double)(totaldiff - idlediff)/totaldiff)*100.0;
+      prevTotal = prevBusy+prevIdle;
+      total = busy+idle;
+
+      totaldiff = total - prevTotal;
+      idlediff = idle - prevIdle;
+
+      percentValue[i] = ((double)(totaldiff - idlediff)/totaldiff)*100.0;
+   }
 }
 
 void *Printer(void *thid){
-	printf("Current values - User: %d Nice: %d System: %d Idle: %d iowait: %d irq: %d softirq: %d Steal: %d Guest: %d Guest_nice: %d \n", cpuValues[0], cpuValues[1],cpuValues[2],cpuValues[3],cpuValues[4],cpuValues[5],cpuValues[6],cpuValues[7],cpuValues[8],cpuValues[9]); //print current values
 
-	printf("Previous values - User: %d Nice: %d System: %d Idle: %d iowait: %d irq: %d softirq: %d Steal: %d Guest: %d Guest_nice: %d \n", oldCpuValues[0], oldCpuValues[1],oldCpuValues[2],oldCpuValues[3],oldCpuValues[4],oldCpuValues[5],oldCpuValues[6],oldCpuValues[7],oldCpuValues[8],oldCpuValues[9]); //print previous values
+   for(int i=0;i<MAXCPUS;i++) {
+      //printf("Previous values CPU %d - User: %d Nice: %d System: %d Idle: %d iowait: %d irq: %d softirq: %d Steal: %d Guest: %d Guest_nice: %d \n", i, oldCpuValues[i][0], oldCpuValues[i][1],oldCpuValues[i][2],oldCpuValues[i][3],oldCpuValues[i][4],oldCpuValues[i][5],oldCpuValues[i][6],oldCpuValues[i][7],oldCpuValues[i][8],oldCpuValues[i][9]); //print previous values
 
-   printf("Current CPU usage: %.3lf %%", percentValue);
+      printf("Current values CPU %d - User: %d Nice: %d System: %d Idle: %d iowait: %d irq: %d softirq: %d Steal: %d Guest: %d Guest_nice: %d \n", i, cpuValues[i][0], cpuValues[i][1],cpuValues[i][2],cpuValues[i][3],cpuValues[i][4],cpuValues[i][5],cpuValues[i][6],cpuValues[i][7],cpuValues[i][8],cpuValues[i][9]); //print current values
+
+      printf("Current CPU %d usage: %.3lf %% \n", i, percentValue[i]);
+   }
 }
 
 int main(){
