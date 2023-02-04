@@ -40,6 +40,8 @@ for(int z=0;z<2;z++){
    fclose(fp); //close file
    sleep(1);
    }
+
+   return EXIT_SUCCESS;
 }
 
 void *Analyzer(void *thid){
@@ -62,6 +64,8 @@ void *Analyzer(void *thid){
 
       percentValue[i] = ((double)(totaldiff - idlediff)/totaldiff)*100.0;
    }
+
+   return EXIT_SUCCESS;
 }
 
 void *Printer(void *thid){
@@ -73,6 +77,8 @@ void *Printer(void *thid){
 
       printf("Current CPU %d usage: %.3lf %% \n", i, percentValue[i]);
    }
+
+   return EXIT_SUCCESS;
 }
 
 int main(){
