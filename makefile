@@ -1,8 +1,8 @@
-#CC = gcc
-#CFLAGS = -g -Wall -Wextra
+CC = gcc
+CFLAGS = -g -Wall -Wextra
 
-CC = clang-12
-CFLAGS = -Weverything
+#CC = clang-12
+#CFLAGS = -Weverything
 
 SRCS=$(wildcard src/*.c)
 

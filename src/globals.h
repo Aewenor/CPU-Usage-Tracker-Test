@@ -1,8 +1,6 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
-#include "libs.h"
-
 extern volatile sig_atomic_t sgnl; //for SIGTERM handling
 
 extern pthread_mutex_t mutex; //initialize mutex

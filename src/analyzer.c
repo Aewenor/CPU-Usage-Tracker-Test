@@ -1,3 +1,4 @@
+#include "libs.h"
 #include "globals.h"
 #include "analyzer.h"
 

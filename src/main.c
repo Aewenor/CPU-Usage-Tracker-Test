@@ -1,4 +1,5 @@
-#include "libs.h"
+#include "main.h"
+#include "globals.h"
 #include "reader.h"
 #include "analyzer.h"
 #include "printer.h"
@@ -16,8 +17,8 @@ double percentValue[MAXCPUS]; //percentage usage of cpu
 
 char logmess[200]; 
 
-void sigRec(){ 
-   printf("SIGTERM signal received. Cleaning memory. \n");
+void sigRec(int term){ 
+   printf("SIGTERM signal %d received. Cleaning memory. \n", term);
    sgnl=1; //set SIGTERM flag to 1
 }
 
