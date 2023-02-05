@@ -1,7 +1,7 @@
 #include "globals.h"
 #include "analyzer.h"
 
-void *Analyzer(){
+void *Analyzer(void *thid){
 
    int prevIdle, idle, prevBusy, busy, prevTotal, total, totaldiff, idlediff;
 
@@ -26,5 +26,5 @@ void *Analyzer(){
 
    pthread_mutex_unlock(&mutex); //release mutex
 
-   return EXIT_SUCCESS;
+   return thid;
 }

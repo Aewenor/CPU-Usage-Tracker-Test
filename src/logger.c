@@ -1,10 +1,10 @@
 #include "globals.h"
 #include "logger.h"
 
-void *Logger(){
+void *Logger(void *thid){
     while(!sgnl){
         FILE *log = fopen("log.txt","a+"); //open file
-            if(logmess!=NULL){
+            if(!strcmp(logmess,"")){
                 pthread_mutex_lock(&logmutex);
                 fprintf(log, "%s \n", logmess);
                 memset(logmess,0, sizeof(logmess));
@@ -14,5 +14,5 @@ void *Logger(){
 
         sleep(2);
     }
-   return EXIT_SUCCESS;
+   return thid;
 }

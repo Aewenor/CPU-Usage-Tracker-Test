@@ -1,7 +1,7 @@
 #include "globals.h"
 #include "reader.h"
 
-void *Reader(){
+void *Reader(void *thid){
 
    char string[100];
    char* token;
@@ -33,5 +33,5 @@ void *Reader(){
 
    pthread_mutex_unlock(&mutex); //release mutex
 
-   return EXIT_SUCCESS;
+   return thid;
 }

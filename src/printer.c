@@ -1,7 +1,7 @@
 #include "globals.h"
 #include "printer.h"
 
-void *Printer(){
+void *Printer(void *thid){
 
    pthread_mutex_lock(&mutex); //enable mutex
 
@@ -15,5 +15,5 @@ void *Printer(){
 
    pthread_mutex_unlock(&mutex); //release mutex
 
-   return EXIT_SUCCESS;
+   return thid;
 }

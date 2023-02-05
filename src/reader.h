@@ -1,6 +1,6 @@
 #ifndef READER_H
 #define READER_H
 
-void *Reader();
+void *Reader(void *thid);
 
 #endif
