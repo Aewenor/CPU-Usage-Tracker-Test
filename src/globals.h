@@ -12,4 +12,6 @@ extern double percentValue[MAXCPUS]; //percentage usage of cpu
 
 extern char logmess[200]; 
 
+extern int watchTimer;
+
 #endif

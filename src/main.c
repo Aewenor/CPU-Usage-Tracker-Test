@@ -4,6 +4,7 @@
 #include "analyzer.h"
 #include "printer.h"
 #include "logger.h"
+#include "watchdog.h"
 
 volatile sig_atomic_t sgnl = 0; //for SIGTERM handling
 
@@ -16,6 +17,8 @@ int oldCpuValues[MAXCPUS][10]; //Storage for previous cpu values
 double percentValue[MAXCPUS]; //percentage usage of cpu
 
 char logmess[200]; 
+
+int watchTimer=0;
 
 void sigRec(int term){ 
    printf("SIGTERM signal %d received. Cleaning memory. \n", term);
@@ -31,6 +34,8 @@ int main(){
    action.sa_handler = sigRec; //set handler to sigRec function
    sigaction(SIGTERM, &action, NULL); //set SIGTERM to be handled by &action
 
+pthread_create(&thread_ids[4], NULL, Watchdog, NULL); //create Watchdog
+pthread_detach(thread_ids[4]); //run Watchdog
 pthread_create(&thread_ids[3], NULL, Logger, NULL); //create Logger
 pthread_detach(thread_ids[3]); //run Logger
 

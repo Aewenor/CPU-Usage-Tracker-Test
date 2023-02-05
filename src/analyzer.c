@@ -27,5 +27,7 @@ void *Analyzer(void *thid){
 
    pthread_mutex_unlock(&mutex); //release mutex
 
+   watchTimer=0;
+
    return thid;
 }
