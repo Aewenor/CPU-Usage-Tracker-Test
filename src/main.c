@@ -17,7 +17,7 @@ double percentValue[MAXCPUS]; //percentage usage of cpu
 char logmess[200]; 
 
 void sigRec(){ 
-   printf("SIGTERM signal received \n");
+   printf("SIGTERM signal received. Cleaning memory. \n");
    sgnl=1; //set SIGTERM flag to 1
 }
 
@@ -44,8 +44,10 @@ pthread_detach(thread_ids[3]); //run Logger
       pthread_join(thread_ids[2], NULL); //run Printer
    }
 
+   sleep(3);
    pthread_mutex_destroy(&mutex); //free mutex
    pthread_mutex_destroy(&logmutex); //free logger mutex
    
+   pthread_exit(NULL);
 }
  
