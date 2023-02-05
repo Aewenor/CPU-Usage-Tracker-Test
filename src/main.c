@@ -23,22 +23,25 @@ void sigRec(){
 
 int main(){
 
+   fclose(fopen("log.txt","w")); //clear log file
+
    struct sigaction action; //signal action init
    memset(&action,0,sizeof(struct sigaction)); //set memory
    action.sa_handler = sigRec; //set handler to sigRec function
    sigaction(SIGTERM, &action, NULL); //set SIGTERM to be handled by &action
 
+pthread_create(&thread_ids[3], NULL, Logger, NULL); //create Logger
+pthread_detach(thread_ids[3]); //run Logger
+
    while(!sgnl){
       pthread_create(&thread_ids[0], NULL, Reader, NULL); //create Reader
       pthread_create(&thread_ids[1], NULL, Analyzer, NULL); //create Analyzer
       pthread_create(&thread_ids[2], NULL, Printer, NULL); //create Printer
-      pthread_create(&thread_ids[3], NULL, Logger, NULL); //create Logger
 
       pthread_join(thread_ids[0], NULL); //run Reader
       sleep(1);
       pthread_join(thread_ids[1], NULL); //run Analyzer
       pthread_join(thread_ids[2], NULL); //run Printer
-      pthread_join(thread_ids[3], NULL); //run Logger
    }
 
    pthread_mutex_destroy(&mutex); //free mutex
