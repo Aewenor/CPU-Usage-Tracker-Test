@@ -2,15 +2,19 @@
 #include "reader.h"
 #include "analyzer.h"
 #include "printer.h"
+#include "logger.h"
 
 volatile sig_atomic_t sgnl = 0; //for SIGTERM handling
 
 pthread_t thread_ids[5]; //IDs of threads
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER; //initialize mutex
+pthread_mutex_t logmutex = PTHREAD_MUTEX_INITIALIZER; //initialize mutex for logger
 
 int cpuValues[MAXCPUS][10]; //Storage for current cpu values
 int oldCpuValues[MAXCPUS][10]; //Storage for previous cpu values
 double percentValue[MAXCPUS]; //percentage usage of cpu
+
+char logmess[200]; 
 
 void sigRec(){ 
    printf("SIGTERM signal received \n");
@@ -28,14 +32,17 @@ int main(){
       pthread_create(&thread_ids[0], NULL, Reader, NULL); //create Reader
       pthread_create(&thread_ids[1], NULL, Analyzer, NULL); //create Analyzer
       pthread_create(&thread_ids[2], NULL, Printer, NULL); //create Printer
+      pthread_create(&thread_ids[3], NULL, Logger, NULL); //create Logger
 
       pthread_join(thread_ids[0], NULL); //run Reader
       sleep(1);
       pthread_join(thread_ids[1], NULL); //run Analyzer
       pthread_join(thread_ids[2], NULL); //run Printer
+      pthread_join(thread_ids[3], NULL); //run Logger
    }
 
    pthread_mutex_destroy(&mutex); //free mutex
+   pthread_mutex_destroy(&logmutex); //free logger mutex
    
 }
  

@@ -13,6 +13,10 @@ void *Reader(){
    memcpy(oldCpuValues,cpuValues, sizeof(cpuValues)); //save old values
 
    fp = fopen("/proc/stat","r"); //open file
+   pthread_mutex_lock(&logmutex);
+   if(fp==NULL) strcpy(logmess,"Reader: Could not open /proc/stat");
+   else strcpy(logmess,"Reader: Successfully opened /proc/stat");
+   pthread_mutex_unlock(&logmutex);
    fgets(string,100,fp); //skip first line with summed cpu usage
    for(int i=0;i<MAXCPUS;i++) {
       fgets(string,100,fp); //get line from file
