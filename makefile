@@ -12,7 +12,7 @@ all: $(TARGET)
 	$(CC) $(CFLAGS) -o $(TARGET) $(SRCS)
 
 test: test
-	$(CC) $(CFLAGS) -o test src/test/test.c
+	$(CC) $(CFLAGS) -o test.o src/test/test.c
 
 clean:
 	$(RM) $(TARGET)
